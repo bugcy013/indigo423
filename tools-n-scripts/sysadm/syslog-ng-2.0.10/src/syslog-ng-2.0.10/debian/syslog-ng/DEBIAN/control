@@ -1,0 +1,17 @@
+Package: syslog-ng
+Version: 2.0.10
+Architecture: i386
+Maintainer: SZALAY Attila <sasa@debian.org>
+Installed-Size: 424
+Depends: libc6 (>= 2.4), util-linux (>= 2.12-10)
+Recommends: logrotate
+Conflicts: linux-kernel-log-daemon, system-log-daemon
+Provides: linux-kernel-log-daemon, system-log-daemon
+Section: admin
+Priority: extra
+Description: Next generation logging daemon
+ Syslog-ng tries to fill the gaps original syslogd's were lacking:
+   * powerful configurability
+   * filtering based on message content
+   * portability
+   * better network forwarding

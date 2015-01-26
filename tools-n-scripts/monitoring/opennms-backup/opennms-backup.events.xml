@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+   <event>
+        <uei xmlns="">uei.opennms.org/backup/opennms/backupSuccess</uei>
+        <event-label xmlns="">defined event OpenNMS backup success</event-label>
+        <descr xmlns="">OpenNMS backup successful</descr>
+        <logmsg dest="logndisplay">OpenNMS: %parm[desc]%.</logmsg>
+        <severity xmlns="">Cleared</severity>
+        <alarm-data reduction-key="%uei%:%nodeid%:%parm[desc]%"
+            alarm-type="2"
+            clear-uei="uei.opennms.org/backup/opennms/backupFailed"
+            clear-key="uei.opennms.org/backup/foundry/backupFailed:%nodeid%:%parm[desc]%" auto-clean="true"/>
+    </event>
+    <event>
+        <uei xmlns="">uei.opennms.org/backup/opennms/backupFailed</uei>
+        <event-label xmlns="">defined event OpenNMS backup failed</event-label>
+        <descr xmlns="">OpenNMS backup failed</descr>
+        <logmsg dest="logndisplay">OpenNMS: %parm[desc]%.</logmsg>
+        <severity xmlns="">Minor</severity>
+    </event>
+</events>

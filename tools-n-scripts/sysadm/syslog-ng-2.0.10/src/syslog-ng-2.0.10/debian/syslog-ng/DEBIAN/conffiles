@@ -1,0 +1,3 @@
+/etc/logrotate.d/syslog-ng
+/etc/init.d/syslog-ng
+/etc/default/syslog-ng

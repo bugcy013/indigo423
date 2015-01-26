@@ -1,0 +1,6 @@
+b92395a533bea2cc7da7667b5cbf9eb1  usr/share/doc/syslog-ng/copyright
+92963379a1d420230d4fa0fe94fc1468  usr/share/doc/syslog-ng/README.Debian
+dbf6ef2a9e925b1cac4e4a8e274b815d  usr/share/doc/syslog-ng/changelog.gz
+f92757aea18149051488e541a5ed18eb  usr/share/doc/syslog-ng/changelog.Debian.gz
+fee352c0f61b9ad016ede074330c6dad  sbin/syslog-ng
+e55640657b2bfeddffe377d4e52fdbe9  bin/loggen

@@ -1,0 +1,156 @@
+The main GOAL of the thresholds categories are simplify the administration tasks of enabling/disabling thresholds on nodes, by adding/removing categories to them.
+
+Besides that, other advantage is having an easy way to identify which thresholds are being applied on each node.
+
+Being said that, the idea is to hide all the complexity of dealing with operating system details, and similar stuff inside the configuration files. That's the reason why there are two ways to add thresholds on the system; simple definitions and complex definitions.
+
+Simple Threshold Definitions
+Procedure for adding a new threshold category:
+
+1) Add the new threshold group on threshd-configuration.xml
+
+The rules are the following:
+
+The name of the package must be the same name of the threshold category
+The name of the threshold-group must be the same name of the threshold category
+The minimal filter content must match the new category
+Example:
+
+<package name="TH-CONTEXT-L-3500">
+    <filter>categoryName == 'TH-CONTEXT-L-3500'</filter>
+    <include-range begin="1.1.1.1" end="254.254.254.254"/>
+    <include-range begin="::1" end="ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"/>
+    <service name="SNMP" interval="300000" user-defined="false" status="on">
+        <parameter key="thresholding-group" value="TH-CONTEXT-L-3500"/>
+    </service>
+</package>
+2) Create an empty group inside thresholds.xml
+
+<group name="TH-CONTEXT-L-3500" rrdRepository="/var/lib/opennms/rrd/snmp/">
+</group>
+3) Edit the threshold group through the WebUI
+
+Go to Admin
+Go to Manage Thresholds
+On that page, Find TH-CONTEXT-L-3500
+Click on Edit
+4) Add the desired thresholds definitions
+
+In order to find the proper metric for the threshold definition, do the following:
+
+Go to the node's page
+Generate a report for the graph that contains the field on which we are going to define the threshold.
+Look at the URL for a parameter called reports to see the graph template name, for example netsnmp.rawcontext.
+Open snmp-graph.properties and find that template netsnmp.rawcontext.
+Pick the variable from the columns (the second line), in this case SysRawContext and remember that the variable type is the 3rd line, in this case, nodeSnmp.
+Here is an example about the information from snmp-graph.properties that you should take care about:
+
+report.netsnmp.rawcontext.name=Context
+report.netsnmp.rawcontext.columns=SysRawContext
+report.netsnmp.rawcontext.type=nodeSnmp
+Now, add the threshold and set the following values:
+
+SysRawContext for the Datasource
+node (which represents nodeSnmp) as their type
+pick the correct threshold type (in this case low)
+Set the threshold value
+Set the ream value
+Set the trigger value
+Set the triggeredUEI (uei.opennms.org/threshold/unix/context/low/warning/exceeded)
+Set the rearmUEI (uei.opennms.org/threshold/unix/context/low/warning/rearmed)
+Keep in mind the syntax for the triggeredUEI and rearmedUEI, must follow the following rules:
+
+uei.opennms.org/threshold/_{serverType}_/_{metricType|purpose}_/_{thresholdType}_/{severity}/_{thresholdCondition}_
+
+where:
+
+serverType (optional): windows, unix, linux
+metricType|purpose: description of the threshold, for example: network/bandwidth/in
+thresholdType: high, low, ac, rc
+thresholdCondition: exceeded, rearmed
+5) Save the configuration
+
+Here is an example about how it should look:
+
+<threshold description="context low threshold 3500 rearm 7000"
+        type="low" ds-type="node" value="3500.0" rearm="7000.0"
+        trigger="2"
+        triggeredUEI="uei.opennms.org/threshold/unix/context/low/warning/exceeded"
+        rearmedUEI="uei.opennms.org/threshold/unix/context/low/warning/rearmed"
+        filterOperator="or" ds-name="SysRawContext"/>
+The WebUI is going to add the default events definition on /etc/opennms/events/programmatic-events.xml, you can actually remove the definitions from that file and use the threshold-config-generator to generate the robust event definitions.
+
+6) Update the event definitions using the tool threshold-config-generator
+
+7) Reload the event configuration
+
+Executing the command:
+
+/usr/share/opennms/bin/send-event.pl uei.opennms.org/internal/eventsConfigChange
+8) Edit the proper requisitions and add the category TH-CONTEXT-L-3500 to the expected nodes
+
+Complex Threshold Definitions
+There are situations on which the creation of a category is not that simple. The idea is to make the category use as simple as possible and add all the complexity on the configuration files, in order to make easier their usage.
+
+The typical cases are when the same metric is handled different on the operating systems, for example, memory thresholds:
+
+<package name="TH-MEMORY-H-95-Windows">
+    <filter>categoryname == 'TH-MEMORY-H-95' &amp; nodeSysOID LIKE '.1.3.6.1.4.1.311.%'</filter>
+    <include-range begin="1.1.1.1" end="254.254.254.254"/>
+    <include-range begin="::1" end="ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"/>
+    <service name="SNMP" interval="300000" user-defined="false" status="on">
+        <parameter key="thresholding-group" value="TH-MEMORY-H-95-Windows"/>
+    </service>
+</package>
+<package name="TH-MEMORY-H-95-Linux">
+    <filter>categoryname == 'TH-MEMORY-H-95' &amp; nodeSysOID == '.1.3.6.1.4.1.8072.3.2.10'</filter>
+    <include-range begin="1.1.1.1" end="254.254.254.254"/>
+    <include-range begin="::1" end="ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"/>
+    <service name="SNMP" interval="300000" user-defined="false" status="on">
+        <parameter key="thresholding-group" value="TH-MEMORY-H-95-Linux"/>
+    </service>
+</package>
+<package name="TH-MEMORY-H-95-Unix">
+    <filter>categoryname == 'TH-MEMORY-H-95' &amp; (nodeSysOID LIKE '.1.3.6.1.4.1.2021.%' | nodeSysOID LIKE '.1.3.6.1.4.1.8072.%') &amp; nodeSysOID != '.1.3.6.1.4.1.8072.3.2.10'</filter>
+    <include-range begin="1.1.1.1" end="254.254.254.254"/>
+    <include-range begin="::1" end="ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"/>
+    <service name="SNMP" interval="300000" user-defined="false" status="on">
+        <parameter key="thresholding-group" value="TH-MEMORY-H-95-Unix"/>
+    </service>
+</package>
+There is a single category named TH-MEMORY-H-95, but the formulas and the metrics involved are different depending on the operating system, so we've created 3 different threshold groups. In this case, the rule is use the same name for the threshold-group and the threshold-package.
+
+Here is the relevant part from thresholds.xml:
+
+<group name="TH-MEMORY-H-95-Windows" rrdRepository="/var/lib/opennms/rrd/snmp/">
+    <expression
+        description="Memory (RAM) usage high 95.0 and rearmed 85.0 (Windows)"
+        type="high" ds-type="hrStorageIndex" value="95.0"
+        rearm="85.0" trigger="1" ds-label="hrStorageDescr"
+        triggeredUEI="uei.opennms.org/threshold/windows/memory/high/minor/exceeded"
+        rearmedUEI="uei.opennms.org/threshold/windows/memory/high/minor/rearmed"
+        filterOperator="or" expression="hrStorageUsed / hrStorageSize * 100.0">
+        <resource-filter field="hrStorageType">^\.1\.3\.6\.1\.2\.1\.25\.2\.1\.2$</resource-filter>
+    </expression>
+</group>
+<group name="TH-MEMORY-H-95-Linux" rrdRepository="/var/lib/opennms/rrd/snmp/">
+    <expression
+        description="Memory (RAM) usage high 95.0 and rearmed 85.0 (Linux)"
+        type="high" ds-type="node" value="95.0" rearm="85.0"
+        trigger="2"
+        triggeredUEI="uei.opennms.org/threshold/linux/memory/high/minor/exceeded"
+        rearmedUEI="uei.opennms.org/threshold/linux/memory/high/minor/rearmed"
+        filterOperator="or" expression="(memTotalReal-memAvailReal-memShared-memBuffer-memCached)/memTotalAvail*100"/>
+</group>
+<group name="TH-MEMORY-H-95-Unix" rrdRepository="/var/lib/opennms/rrd/snmp/">
+    <expression
+        description="Memory (RAM) usage high 95.0 and rearmed 85.0 (Unix)"
+        type="high" ds-type="node" value="95.0" rearm="85.0"
+        trigger="2"
+        triggeredUEI="uei.opennms.org/threshold/unix/memory/high/minor/exceeded"
+        rearmedUEI="uei.opennms.org/threshold/unix/memory/high/minor/rearmed"
+        filterOperator="or" expression="(memTotalReal-memAvailReal-memBuffer-memCached)/memTotalAvail*100"/>
+</group>
+
+
+

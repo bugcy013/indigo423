@@ -1,0 +1,73 @@
+Om the GIT repository there is a folder called threshold-config-generator.
+
+This folder contains the Maven files and the source code of the stand alone tool created to generate automatically the events definitions file and the notifications file based on the custom UEIs defined on a pre-defined thresholds.xml.
+
+In order to compile the project, you must execute the following command:
+
+mvn install
+This is going to generate one big JAR file with all the dependencies embedded.
+
+The tool generates two files based on the UEI used on thresholds.xml for triggeredUEI and rearmedUEI:
+
+Thresholds-Categorized.events.xml
+notifications.xml [optional]
+Of course, the tool expect that the UEIs have the following format:
+
+uei.opennms.org/threshold/{serverType}/{metricType|purpose}/{thresholdType}/{severity}/{thresholdCondition}
+
+where:
+
+serverType (optional): windows, unix, linux
+metricType|purpose: description of the threshold, for example: network/bandwidth/in
+thresholdType: high, low, ac, rc
+thresholdCondition: exceeded, rearmed
+The tool reads a pre-defined configuration file called config.properties where all the customizations used for instances of generic resources and graph links are defined. It is possible to pass an external file if you want to change some of the customizations or add new entries.
+
+Here is a guide for the config entries:
+
+destinationPath[XXX] = YYY
+XXX, is a regular expression applied to the UEIs.
+YYY, is the name of the destinationPath that will be assigned to the notifications based on the expression XXX
+
+It is possible to define several entries with this syntax.
+
+For example:
+
+destinationPath[.*] = Email-Admin
+instance[XXX] = YYY
+XXX, is a section of the UEI to be used as substring.
+YYY, is the text associated with the instance
+
+It is possible to define several entries with this syntax.
+
+For example:
+
+instance[/network/bandwidth] = interface <b>%parm[ifLabel]%</b> (ifIndex <b>%parm[ifIndex]%</b>)
+instance[/windows/cpu/] = instance <b>%parm[label]%</b>
+graphLink.resourceId[XXX] = YYY
+XXX, is a section of the UEI to be used as substring.
+YYY, is the Resource ID format.
+
+It is possible to define several entries with this syntax.
+
+For example:
+
+graphLink.resourceId[/disk-io/] = node[%nodeid%].diskIOIndex[%parm[instance]%]
+graphLink.resourceId[/unix/context/] = node[%nodeid%].nodeSnmp[]
+graphLink.reports[XXX] = YYY
+XXX, is a section of the UEI to be used as substring.
+YYY, is a list of comma separated values of the graph templates to apply. The default is "all"
+
+It is possible to define several entries with this syntax.
+
+For example:
+
+graphLink.reports[/disk-io/] = netsnmp.diskio.bytes
+
+
+
+The recommended configuration for thresholds is on the GIT repository under the folder threshold-config.
+
+This folder contains the new versions for threshd-conffiguration.xml and thresholds.xml based on categories.
+
+The idea is to avoid changes on thresholds configuration and associate a sub-set of predefined categories to the nodes. That way, you always know which thresholds are being applied on a node, and you can control on a easy way which thresholds must be added or removed.

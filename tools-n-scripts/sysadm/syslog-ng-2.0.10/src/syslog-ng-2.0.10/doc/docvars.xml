@@ -1,0 +1,2 @@
+<!ENTITY syslogng_version "2.0.10">
+<!ENTITY syslogng_revision "ssh+git://bazsi@git.balabit//var/scm/git//syslog-ng/syslog-ng-ose--mainline--2.0--master#54a9923cac50ce9aabd1b84b78a07427e2254bcc">

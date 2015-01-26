@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+    <!-- Events to handle Asset export and versioning in Subversion Repository -->
+    <event>
+        <uei xmlns="">uei.opennms.org/assets/assetexport/sqlExportFailed</uei>
+        <event-label xmlns="">defined event SQL export failed</event-label>
+        <descr xmlns="">SQL asset export from OpenNMS database failed </descr>
+        <logmsg dest="logndisplay">SQL asset export with %parm[sqlfile]% from OpenNMS database failed. Error occurred in script %parm[script]%.</logmsg>
+        <severity xmlns="">Warning</severity>
+    </event>
+    <event>
+        <uei xmlns="">uei.opennms.org/assets/assetexport/sqlExportSuccess</uei>
+        <event-label xmlns="">defined event SQL export successful</event-label>
+        <descr xmlns="">SQL asset export from OpenNMS database successful</descr>
+        <logmsg dest="logndisplay">SQL asset export from %parm[script]% with %parm[sqlfile]% from OpenNMS database successful.</logmsg>
+        <severity xmlns="">Cleared</severity>
+        <alarm-data reduction-key="%uei%:%nodeid%"
+            alarm-type="2"
+            clear-uei="uei.opennms.org/assets/assetexport/sqlExportFailed"
+            clear-key="uei.opennms.org/assets/assetexport/sqlExportFailed:%nodeid%" auto-clean="true"/>
+	<operinstruct>http://monet-db.fd2.assets-intern.com/asset-export/output.html</operinstruct>
+    </event>
+    <event>
+        <uei xmlns="">uei.opennms.org/assets/assetexport/svnCommitFailed</uei>
+        <event-label xmlns="">defined event automated SVN commit failed</event-label>
+        <descr xmlns="">Automated SVN commit failed</descr>
+        <logmsg dest="logndisplay">Automated SVN commit from %nodelabel% in %parm[folder]% failed. Error occurred in script %parm[script]%.</logmsg>
+        <severity xmlns="">Warning</severity>
+    </event>
+    <event>
+        <uei xmlns="">uei.opennms.org/assets/assetexport/svnCommitSuccess</uei>
+        <event-label xmlns="">defined event automated SVN commit successful</event-label>
+        <descr xmlns="">Automated SVN commit SVN successful</descr>
+        <logmsg dest="logndisplay">Automated SVN commit with %parm[script]% from %nodelabel% in %parm[folder]% successful.</logmsg>
+        <severity xmlns="">Cleared</severity>
+        <alarm-data reduction-key="%uei%:%nodeid%"
+            alarm-type="2"
+            clear-uei="uei.opennms.org/assets/assetexport/svnCommitFailed"
+            clear-key="uei.opennms.org/assets/assetexport/svnCommitFailed:%nodeid%" auto-clean="true"/>
+    </event>
+</events>

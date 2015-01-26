@@ -1,0 +1,88 @@
+---------------------------
+Introduction
+----------------------
+Configuration checks if the process ntpd is running with detailed longterm data collection.
+
+Long term data collection for delay, offset and jitter in milliseconds.
+ - Delay:  round trip time of queries
+ - Offset: difference between reference time and system clock
+ - Jitter: magnitude of jitter between several time queries
+
+Requirements:
+ - ntpd should be installed and snmp must be able to execute ntpq -pn
+ - Net-SNMP must be installed and must be able to run ntpq -pn and the wrapper script ntpwatch.sh
+ - OpenNMS 1.8+ for using detectors in provisioning requisitions
+ - OpenNMS 1.6.x users have to use Capsd and it is not possible to have dedicated configuration files.
+   It is necessary to merge graph.properties and data collection configuration.
+
+Created:
+  02/17/2012 <ronny@opennms.org> - Version 1.2
+
+License: GPLv3
+
+---------------------------
+A. Net-SNMP configuration
+----------------------
+  A.1. Copy ntpwatch.sh from scripts to 
+
+         /usr/local/bin
+
+  A.2. Extend Net-SNMP configuration in /etc/snmpd.conf with
+
+  #############################################################################
+  # OpenNMS example - Extending Net-SNMP with user defined scripts
+  #
+  # extend [MIBOID] NAME PROG ARGS
+  extend ntpq_delay '/usr/local/bin/ntpwatch.sh delay'
+  extend ntpq_jitter '/usr/local/bin/ntpwatch.sh jitter'
+  extend ntpq_offset '/usr/local/bin/ntpwatch.sh offset'
+
+  A.3. Restart Net-SNMP with
+
+         service snmpd restart
+
+  Hint:
+  -----
+    Be sure the user context of snmpd has permissions to execute ntpwatch.sh
+
+---------------------------
+B. OpenNMS Configuration
+----------------------
+  B.1. Copy netsnmp-ntp.xml to ${OPENNMS_HOME}/etc/datacollection
+
+  B.2. Copy netsnmp-ntpq.properties to ${OPENNMS_HOME}/etc/snmp-graph.properties.d
+
+  B.3. Add to ${OPENNMS_HOME}/etc/datacollection-config.xml
+
+         <include-collection dataCollectionGroup="Net-SNMP-NTP"/>
+
+  B.4. restart OpenNMS with
+
+         service opennms restart
+
+---------------------------
+C. Process monitoring
+---------------------
+  C.1. Create a HostResourceSwRunMonitor in ${OPENNMS_HOME}/etc/poller-configuration.xml
+  
+  <service name="Proc-NTP" interval="300000" user-defined="false" status="on">                                                                 
+      <parameter key="retry" value="5"/>
+      <parameter key="timeout" value="5950"/>
+      <parameter key="port" value="161"/>
+      <parameter key="service-name" value="ntpd"/>
+  </service>
+  .
+  <monitor service="Proc-NTP" class-name="org.opennms.netmgt.poller.monitors.HostResourceSwRunMonitor"/>
+
+  C.3. Restart OpenNMS with
+
+         service opennms restart
+
+  C.2. Assign a detector in Provisioning Requisition for the process ntpd
+
+  <detector class="org.opennms.netmgt.provision.detector.snmp.HostResourceSWRunDetector" name="Proc-NTP">
+       <parameter value="ntpd" key="serviceToDetect"/>
+  </detector>
+
+  C.4. Synchronize the Provisioning requisition
+

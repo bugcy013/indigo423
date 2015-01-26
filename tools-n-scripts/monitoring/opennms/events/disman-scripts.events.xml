@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<events>
+  <event>
+    <mask>
+      <maskelement>
+        <mename>id</mename>
+        <mevalue>.1.3.6.1.2.1.64.2</mevalue>
+      </maskelement>
+      <maskelement>
+        <mename>generic</mename>
+        <mevalue>6</mevalue>
+      </maskelement>
+      <maskelement>
+        <mename>specific</mename>
+        <mevalue>2</mevalue>
+      </maskelement>
+      <varbind>
+        <vbnumber>2</vbnumber>
+        <vbvalue>success</vbvalue>
+      </varbind>
+    </mask>
+    <uei>uei.opennms.org/netsnmp/disman/script/success</uei>
+    <event-label>NET-SNMP: Script event success triggered.</event-label>
+    <descr>
+&lt;p&gt;Script exection %parm[#1]% with argument %parm[#4]% successful. %parm[#3]%&lt;/p&gt;
+        </descr>
+    <logmsg dest="logndisplay">&lt;p&gt;
+                        %parm[#3]% successful.&lt;/p&gt;
+                </logmsg>
+    <severity>Cleared</severity>
+    <alarm-data reduction-key="%uei%:%dpname%:%nodeid%:%parm[#1]%:%parm[#4]%" alarm-type="3" auto-clean="false"/>
+  </event>
+  <event>
+    <mask>
+      <maskelement>
+        <mename>id</mename>
+        <mevalue>.1.3.6.1.2.1.64.2</mevalue>
+      </maskelement>
+      <maskelement>
+        <mename>generic</mename>
+        <mevalue>6</mevalue>
+      </maskelement>
+      <maskelement>
+        <mename>specific</mename>
+        <mevalue>2</mevalue>
+      </maskelement>
+      <varbind>
+        <vbnumber>2</vbnumber>
+        <vbvalue>failed</vbvalue>
+      </varbind>
+    </mask>
+    <uei>uei.opennms.org/netsnmp/disman/script/failed</uei>
+    <event-label>NET-SNMP: Script event failed triggered.</event-label>
+    <descr>
+&lt;p&gt;Script exection %parm[#1]% with argument %parm[#4]% failed. %parm[#3]%&lt;/p&gt;
+        </descr>
+    <logmsg dest="logndisplay">&lt;p&gt;
+                        %parm[#3]% failed.&lt;/p&gt;
+                </logmsg>
+    <severity>Minor</severity>
+    <alarm-data reduction-key="%uei%:%dpname%:%nodeid%:%parm[#1]%:%parm[#4]%" alarm-type="3" auto-clean="false"/>
+  </event>
+</events>

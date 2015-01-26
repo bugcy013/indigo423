@@ -1,0 +1,18 @@
+Format: 1.7
+Date: Wed, 19 Nov 2008 12:50:44 +0100
+Source: syslog-ng
+Binary: syslog-ng
+Architecture: i386
+Version: 2.0.10
+Distribution: syslogng20
+Urgency: low
+Maintainer: SZALAY Attila <sasa@debian.org>
+Changed-By: BalaBit Development Team <devel@balabit.hu>
+Description: 
+ syslog-ng  - Next generation logging daemon
+Changes: 
+ syslog-ng (2.0.10) syslogng20; urgency=low
+ .
+   * New upstream version.
+Files: 
+ 7d1e7ae189e48c179f958664832cf0ef 172016 admin extra syslog-ng_2.0.10_i386.deb
